@@ -1,11 +1,9 @@
-import sys
 
-from setuptools import find_packages, setup
-print(sys.path)
+from setuptools import setup
 setup(
     name='reefscanner',
     packages=['reefscanner.basic_model'],
-    version='0.1.6',
+    version='0.1.11',
     description='aims_reef_scanner_data_model',
     author='Greg',
     license='MIT',

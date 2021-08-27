@@ -1,3 +1,10 @@
 /venv/
 /src/build/
 /src/reefscanner.egg-info/
+/.idea/
+/build/
+/dist/
+/reefscanner.egg-info/dependency_links.txt
+/reefscanner.egg-info/PKG-INFO
+/reefscanner.egg-info/SOURCES.txt
+/reefscanner.egg-info/top_level.txt

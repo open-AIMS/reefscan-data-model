@@ -1,9 +1,12 @@
 import datetime
+import logging
 import os
 
 from reefscanner.basic_model.exif_utils import get_exif_data
 from reefscanner.basic_model.json_utils import write_json_file, read_json_file
+from reefscanner.basic_model.progress_queue import ProgressQueue
 
+logger = logging.getLogger(__name__)
 
 def save_survey(survey):
     survey_to_save = survey.copy()
@@ -16,15 +19,11 @@ def save_survey(survey):
     write_json_file(folder, 'survey.json', survey_to_save)
 
 
-def read_survey_data(data_folder, trip, set_progress_status, default_project, default_operator, data_array):
-    # self.progress_dialog.setLabelText("Reading surveys")
-    # self.data_folder = data_folder
-    # self.data_array = []
+def read_survey_data(data_folder, trip, default_project, default_operator, data_array, progress_queue: ProgressQueue):
+    progress_queue.set_progress_label("Reading surveys")
     surveys_folder = f'{data_folder}/surveys'
     survey_folders = os.listdir(surveys_folder)
-    set_progress_status("setMaximum", (len(survey_folders)))
-    folders_processed = 0
-    set_progress_status("setValue", folders_processed)
+    progress_queue.set_progress_max(len(survey_folders))
     for survey_folder in survey_folders:
         full_path = f'{surveys_folder}/{survey_folder}'
         if os.path.isdir(full_path):
@@ -73,8 +72,7 @@ def read_survey_data(data_folder, trip, set_progress_status, default_project, de
             survey["id"] = survey_folder
             survey["folder"] = full_path
             data_array.append(survey)
-            folders_processed += 1
-            set_progress_status("setValue", folders_processed)
+            progress_queue.set_progress_value()
 
 
 def save_site(site, all_sites):
