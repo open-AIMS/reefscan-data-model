@@ -34,7 +34,11 @@ class BasicModel(object):
         progress_queue.set_progress_label("Reading trip data")
         self.read_trip()
         progress_queue.set_progress_label("Reading project data")
-        self.read_projects()
+        try:
+            self.read_projects()
+        except:
+            logger.warning("No Projects")
+            self.projects=[]
 
         self.read_surveys(progress_queue)
         self.read_sites()
