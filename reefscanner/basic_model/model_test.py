@@ -1,6 +1,5 @@
 from reefscanner.basic_model.basic_model import BasicModel
 from reefscanner.basic_model.progress_queue import ProgressQueue
-from reefscanner.basic_model.set_progress_status_basic import set_progress_status_basic
 
 basic_model = BasicModel()
 basic_model.data_folder = "C:/aims/reef-scanner"
