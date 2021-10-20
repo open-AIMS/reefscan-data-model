@@ -21,7 +21,7 @@ def save_survey(survey):
 
 def read_survey_data(data_folder, trip, default_project, default_operator, data_array, progress_queue: ProgressQueue):
     progress_queue.set_progress_label("Reading surveys")
-    surveys_folder = f'{data_folder}/surveys'
+    surveys_folder = f'{data_folder}/images'
     survey_folders = os.listdir(surveys_folder)
     progress_queue.set_progress_max(len(survey_folders))
     for survey_folder in survey_folders:
