@@ -3,7 +3,6 @@ from reefscanner.basic_model.progress_no_queue import ProgressNoQueue
 from reefscanner.basic_model.progress_queue import ProgressQueue
 
 basic_model = BasicModel()
-basic_model.data_folder = "C:/aims/reef-scanner"
 
 # progress_queue = ProgressQueue()
 # basic_model.read_from_files(progress_queue)
@@ -20,6 +19,7 @@ basic_model.data_folder = "C:/aims/reef-scanner"
 #         ok = False
 
 progress_queue = ProgressNoQueue()
+basic_model.set_data_folders("C:/aims/reef-scanner")
 basic_model.read_from_files(progress_queue)
 
 

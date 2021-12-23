@@ -3,7 +3,11 @@ from PIL import Image
 
 
 def get_exif_data(photo, open_photo_if_needed):
-    exif_dict = piexif.load(photo)
+    try:
+        exif_dict = piexif.load(photo)
+    except:
+        raise Exception("Can't get exif data for " + photo)
+
     try:
         width = exif_dict["Exif"][piexif.ExifIFD.PixelXDimension]
         height = exif_dict["Exif"][piexif.ExifIFD.PixelYDimension]
@@ -17,8 +21,12 @@ def get_exif_data(photo, open_photo_if_needed):
         else:
             width=None
             height=None
-    gps = exif_dict["GPS"]
-    (lat, lon, date1) = get_coordinates(gps)
+    try:
+        gps = exif_dict["GPS"]
+        (lat, lon, date1) = get_coordinates(gps)
+    except:
+        raise Exception("Can't get exif data for " + photo)
+
     return {"latitude": lat, "longitude": lon, "date_taken": date1, "width": width, "height": height}
 
 
