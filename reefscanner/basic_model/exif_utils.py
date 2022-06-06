@@ -24,8 +24,8 @@ def get_exif_data(photo, open_photo_if_needed):
     try:
         gps = exif_dict["GPS"]
         (lat, lon, date1) = get_coordinates(gps)
-    except:
-        raise Exception("Can't get exif data for " + photo)
+    except Exception as e:
+        raise Exception("Can't get exif data for " + photo, e)
 
     return {"latitude": lat, "longitude": lon, "date_taken": date1, "width": width, "height": height}
 
@@ -35,6 +35,13 @@ def get_coordinates(geotags):
     lon = get_decimal_from_dms(geotags[piexif.GPSIFD.GPSLongitude], geotags[piexif.GPSIFD.GPSLongitudeRef])
     date = geotags[piexif.GPSIFD.GPSDateStamp]
     date = "".join(map(chr, date))
+    if piexif.GPSIFD.GPSTimeStamp in geotags:
+        time = geotags[piexif.GPSIFD.GPSTimeStamp]
+        if len(date) == 10 and len(time) >= 3:
+            hours = time[0][0]/time[0][1]
+            mins = time[1][0]/time[1][1]
+            secs = time[2][0]/time[2][1]
+            date = f"{date} {hours:02.0f}:{mins:02.0f}:{secs:02.0f}"
     # date format returned is weird. Has colons in the data part and no T
     date1 = date[0:4] + "-" + date[5:7] + "-" + date[8:10] + "T" + date[11:20]
     return (lat, lon, date1)

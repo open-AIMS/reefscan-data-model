@@ -5,7 +5,7 @@ from reefscanner.basic_model.samba.file_ops_factory import get_file_ops
 
 
 def make_photo_csv(folder):
-    csv_file_name = folder + "/photos.csv"
+    csv_file_name = folder + "/photo_log.csv"
     if os.path.exists("csv_file_name"):
         raise Exception(csv_file_name + " already exists.")
 
@@ -27,7 +27,7 @@ def make_photo_csv(folder):
 
 def track(folder, samba):
     file_ops = get_file_ops(samba)
-    csv_file_name = folder + "/photos.csv"
+    csv_file_name = folder + "/photo_log.csv"
     if file_ops.exists(csv_file_name):
         with file_ops.open(csv_file_name) as file:
             df = pd.read_csv(file)

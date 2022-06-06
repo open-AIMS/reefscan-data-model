@@ -1,4 +1,5 @@
 import os
+import shutil
 from os import path
 
 
@@ -14,3 +15,12 @@ class OsFileOps:
 
     def open(self, filename, mode="r"):
         return open(filename, mode=mode)
+
+    def rmdir(self, dir):
+        return os.rmdir(dir)
+
+    def remove(self, fname):
+        return os.remove(fname)
+
+    def copyfile(self, frm, to):
+        return shutil.copyfile(frm, to)

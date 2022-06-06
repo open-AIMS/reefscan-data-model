@@ -1,5 +1,5 @@
 import smbclient
-from smbclient import path
+from smbclient import path, shutil
 
 
 class SambaFileOps:
@@ -17,3 +17,13 @@ class SambaFileOps:
 
     def exists(self, fname):
         return smbclient.path.exists(fname)
+
+    def rmdir(self, dir):
+        return smbclient.rmdir(dir)
+
+    def remove(self, fname):
+        return smbclient.remove(fname)
+
+
+    def copyfile(self, frm, to):
+        return smbclient.shutil.copyfile(frm, to)
