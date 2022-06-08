@@ -23,13 +23,22 @@ def save_survey(survey):
     write_json_file(json_folder, 'survey.json', survey_to_save)
 
 
-def read_survey_data(base_image_folder, json_folder, trip, default_project, default_operator, progress_queue: ProgressQueue, samba, slow_network):
-    if not samba and default_project == -1:
-        relative_root_path = "fieldData"
-        relative_photo_path = "sourceData/processedData"
-    else:
-        relative_root_path = "images"
-        relative_photo_path = ""
+def dict_has(dict, column):
+    if column not in dict:
+        return False
+
+    if dict[column] is None:
+        return False
+
+    if dict[column] == "":
+        return False
+
+    return True
+
+
+def read_survey_data(base_image_folder, json_folder, default_vessel, default_observer, default_operator, progress_queue: ProgressQueue, samba, slow_network):
+    relative_root_path = "images"
+    relative_photo_path = ""
 
     file_ops = get_file_ops(samba)
     if base_image_folder is None:
@@ -47,17 +56,32 @@ def read_survey_data(base_image_folder, json_folder, trip, default_project, defa
         full_survey_image_path = f'{image_folder}/{survey_image_folder}/{relative_photo_path}'
         full_survey_json_path = f'{json_folder}/{relative_root_path}/{survey_image_folder}'
         if file_ops.isdir(full_survey_image_path):
+            source_survey_file = f'{full_survey_image_path}/survey.json'
             survey_file = f'{full_survey_json_path}/survey.json'
+            # there may be a survey.json on the camera but not yet on the computer
+            # if so copy it
+            if file_ops.exists(source_survey_file) and not os.path.exists(survey_file):
+                file_ops.copyfile(source_survey_file, survey_file)
+
             if os.path.exists(survey_file):
                 survey = read_json_file(survey_file)
             else:
                 survey = None
 
             if survey is None:
-                survey = {"site": "",
-                          "project": default_project, "operator": default_operator,
-                          "vessel": trip["vessel"], "trip": trip["uuid"]
+                survey = {"reef": "", "site": "",
+                          "operator": default_operator, "observer" : default_observer,
+                          "vessel": default_vessel
                           }
+
+            if not dict_has (survey, "operator"):
+                survey["operator"] = default_operator
+
+            if not dict_has (survey, "observer"):
+                survey["observer"] = default_observer
+
+            if not dict_has (survey, "vessel"):
+                survey["vessel"] = default_vessel
 
             if samba or slow_network:
                 has_photos = True
@@ -105,59 +129,4 @@ def get_stats_from_photos(file_ops, full_path, survey):
 
     return count_photos > 0
 
-
-def save_site(site, all_sites):
-    # check for duplicate names
-    for other_site in all_sites:
-        site_name_ = site["name"]
-        site_uuid_ = site["uuid"]
-        if (site_name_ == other_site["name"]) and (site_uuid_ != other_site["uuid"]):
-            raise Exception(f"Duplicate Site Name {site_name_}")
-
-    site_to_save = site.copy()
-    site_to_save.pop('uuid')
-    folder = site_to_save.pop('folder')
-    write_json_file(folder, 'site.json', site_to_save)
-
-
-def read_site_data(datafolder, data_array):
-    # self.datafolder = datafolder
-    sites_folder = f'{datafolder}/sites'
-    site_folders = os.listdir(sites_folder)
-    for site_folder in site_folders:
-        site_full_path = f'{sites_folder}/{site_folder}'
-        if os.path.isdir(site_full_path):
-            site_file = f'{site_full_path}/site.json'
-            site = read_json_file(site_file)
-            site["folder"] = site_full_path
-            site["uuid"] = site_folder
-            data_array.append(site)
-
-
-def save_method(method, all_methods):
-    # check for duplicate names
-    method_name_ = method["name"]
-    method_uuid_ = method["uuid"]
-    for other_method in all_methods:
-        if (method_name_ == other_method["name"]) and (method_uuid_ != other_method["uuid"]):
-            raise Exception(f"Duplicate Site Name {method_name_}")
-
-    method_to_save = method.copy()
-    method_to_save.pop('uuid')
-    folder = method_to_save.pop('folder')
-    write_json_file(folder, 'method.json', method_to_save)
-
-
-def read_method_data(datafolder, data_array):
-    # self.datafolder = datafolder
-    methods_folder = f'{datafolder}/methods'
-    method_folders = os.listdir(methods_folder)
-    for method_folder in method_folders:
-        method_full_path = f'{methods_folder}/{method_folder}'
-        if os.path.isdir(method_full_path):
-            method_file = f'{method_full_path}/method.json'
-            method = read_json_file(method_file)
-            method["folder"] = method_full_path
-            method["uuid"] = method_folder
-            data_array.append(method)
 

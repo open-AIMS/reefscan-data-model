@@ -24,15 +24,14 @@ basic_model = BasicModel()
 #         ok = False
 
 progress_queue = ProgressNoQueue()
-basic_model.set_data_folders("D:/Trip7785_DaviesReef_CoralAUV_ReefScanTesting/ReefScan", "")
-# basic_model.set_data_folders("c:/temp/dum", "")
+# basic_model.set_data_folders("D:/Trip7785_DaviesReef_CoralAUV_ReefScanTesting/ReefScan", "")
+basic_model.set_data_folders("c:/temp/dum", "")
 basic_model.slow_network = False
-basic_model.read_from_files(progress_queue)
+basic_model.read_from_files(progress_queue, camera_connected=False)
 # basic_model.new_method()
 
 logger.info("done")
 
-logger.info(basic_model.projects)
 logger.info(basic_model.surveys_data)
 
 basic_model.export()

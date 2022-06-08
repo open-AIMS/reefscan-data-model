@@ -9,7 +9,7 @@ class ProgressQueue(object):
         self.q = queue.Queue()
 
     def set_progress_max(self, i):
-        logger.info("progress queue max " + i )
+        logger.info("progress queue max " + str(i) )
         self.q.put(("max", i))
 
     def set_progress_value(self):
