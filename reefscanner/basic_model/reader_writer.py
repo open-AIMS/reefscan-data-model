@@ -61,6 +61,7 @@ def read_survey_data(base_image_folder, json_folder, default_vessel, default_obs
             # there may be a survey.json on the camera but not yet on the computer
             # if so copy it
             if file_ops.exists(source_survey_file) and not os.path.exists(survey_file):
+                os.makedirs(full_survey_json_path, exist_ok=True)
                 file_ops.copyfile(source_survey_file, survey_file)
 
             if os.path.exists(survey_file):
