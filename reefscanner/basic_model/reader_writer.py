@@ -37,7 +37,7 @@ def dict_has(dict, column):
 
 
 def read_survey_data(base_image_folder, json_folder, default_vessel, default_observer, default_operator, progress_queue: ProgressQueue, samba, slow_network):
-    relative_root_path = "images"
+    relative_root_path = ""
     relative_photo_path = ""
 
     file_ops = get_file_ops(samba)
