@@ -4,6 +4,10 @@ from os import path
 
 
 class OsFileOps:
+
+    def file_size_mb(self, file):
+        return os.path.getsize(file)/1000000
+
     def listdir(self, dir):
         return os.listdir(dir)
 
@@ -24,3 +28,9 @@ class OsFileOps:
 
     def copyfile(self, frm, to):
         return shutil.copyfile(frm, to)
+
+    def move(self, frm, to):
+        return os.rename(frm, to)
+
+    def mkdir(self, dir):
+        os.mkdir(dir)

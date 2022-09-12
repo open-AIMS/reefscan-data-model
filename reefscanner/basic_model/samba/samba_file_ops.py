@@ -6,6 +6,10 @@ class SambaFileOps:
     def __init__(self):
         smbclient.ClientConfig(username='jetson', password='jetson')
 
+    def file_size_mb(self, file):
+        # return smbclient.path.getsize(file)/1000000
+        return smbclient.lstat(file).st_size/1000000
+
     def listdir(self, dir):
         return smbclient._os.listdir(dir)
 
@@ -24,6 +28,11 @@ class SambaFileOps:
     def remove(self, fname):
         return smbclient.remove(fname)
 
-
     def copyfile(self, frm, to):
         return smbclient.shutil.copyfile(frm, to)
+
+    def mkdir(self, dir):
+        smbclient.mkdir(dir)
+
+    def move(self, frm, to):
+        smbclient.rename(frm, to)

@@ -8,8 +8,11 @@ class ProgressNoQueue(object):
         self.value = 0
         self.max = 0
 
+    def reset(self):
+        self.value = 0
+
     def set_progress_max(self, i):
-        self.max = 0
+        self.max = i
 
     def set_progress_value(self):
         self.value += 1

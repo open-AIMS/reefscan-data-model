@@ -2,6 +2,8 @@ import datetime
 import logging
 import os
 
+from reefscanner.archive_stats.archive_stats import ArchiveStats
+from reefscanner.archive_stats.archive_survey_stats import ArchiveSurveyStats
 from reefscanner.basic_model.exif_utils import get_exif_data
 from reefscanner.basic_model.json_utils import write_json_file, read_json_file
 from reefscanner.basic_model.progress_queue import ProgressQueue
@@ -10,9 +12,10 @@ from reefscanner.basic_model.samba.file_ops_factory import get_file_ops
 logger = logging.getLogger(__name__)
 
 
-def save_survey(survey):
+def save_survey(survey, primary_folder, backup_folder):
     survey_to_save = survey.copy()
     json_folder = survey_to_save.pop('json_folder')
+    backup_json_folder = json_folder.replace(primary_folder, backup_folder)
     image_folder = survey_to_save.pop('image_folder')
     survey_to_save.pop("id")
     # survey_to_save.pop("start_lat")
@@ -21,6 +24,7 @@ def save_survey(survey):
     # survey_to_save.pop("finish_lon")
     survey_to_save.pop("samba")
     write_json_file(json_folder, 'survey.json', survey_to_save)
+    write_json_file(backup_json_folder, 'survey.json', survey_to_save)
 
 
 def dict_has(dict, column):
@@ -51,7 +55,7 @@ def read_survey_data(base_image_folder, json_folder, default_vessel, default_obs
     else:
         survey_image_folders = []
 
-    progress_queue.set_progress_max(len(survey_image_folders))
+    progress_queue.set_progress_max(len(survey_image_folders) + 1)
     for survey_image_folder in survey_image_folders:
         full_survey_image_path = f'{image_folder}/{survey_image_folder}/{relative_photo_path}'
         full_survey_json_path = f'{json_folder}/{relative_root_path}/{survey_image_folder}'
@@ -97,6 +101,13 @@ def read_survey_data(base_image_folder, json_folder, default_vessel, default_obs
                 data[survey["id"]] = survey
             progress_queue.set_progress_value()
     return data
+
+
+
+
+
+
+
 
 
 def get_stats_from_photos(file_ops, full_path, survey):

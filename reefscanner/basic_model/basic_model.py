@@ -40,6 +40,7 @@ class BasicModel(object):
         logger.info("start read from files")
         start = datetime.datetime.now()
 
+        progress_queue.reset()
         progress_queue.set_progress_label("Reading data from local file system")
         try:
             self.surveys_data = self.read_surveys(progress_queue, self.data_folder, self.data_folder, self.local_samba,
@@ -48,12 +49,13 @@ class BasicModel(object):
             raise Exception("Error can't find local files")
 
         if camera_connected:
+            progress_queue.reset()
             progress_queue.set_progress_label("Reading data from camera")
             try:
                 self.camera_surveys = self.read_surveys(progress_queue, self.camera_data_folder, self.data_folder,
                                                         self.camera_samba, False)
             except:
-                raise Exception("Error can't find camera")
+                raise Exception("Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera.")
 
         # finish = datetime.datetime.now()
         # delta = finish - start
@@ -75,6 +77,8 @@ class BasicModel(object):
         survey_list = []
         for folder in self.surveys_data.keys():
             survey = self.surveys_data[folder]
+            if 'sequence_name' in survey:
+                survey.pop("sequence_name")
             survey_list.append(survey)
 
         return pd.DataFrame(survey_list)
