@@ -57,57 +57,51 @@ def read_survey_data(base_image_folder, json_folder, default_vessel, default_obs
 
     progress_queue.set_progress_max(len(survey_image_folders) + 1)
     for survey_image_folder in survey_image_folders:
-        full_survey_image_path = f'{image_folder}/{survey_image_folder}/{relative_photo_path}'
-        full_survey_json_path = f'{json_folder}/{relative_root_path}/{survey_image_folder}'
-        if file_ops.isdir(full_survey_image_path):
-            source_survey_file = f'{full_survey_image_path}/survey.json'
-            survey_file = f'{full_survey_json_path}/survey.json'
-            # there may be a survey.json on the camera but not yet on the computer
-            # if so copy it
-            if file_ops.exists(source_survey_file) and not os.path.exists(survey_file):
-                os.makedirs(full_survey_json_path, exist_ok=True)
-                file_ops.copyfile(source_survey_file, survey_file)
+        if survey_image_folder != "archive":
+            full_survey_image_path = f'{image_folder}/{survey_image_folder}/{relative_photo_path}'
+            full_survey_json_path = f'{json_folder}/{relative_root_path}/{survey_image_folder}'
+            if file_ops.isdir(full_survey_image_path):
+                source_survey_file = f'{full_survey_image_path}/survey.json'
+                survey_file = f'{full_survey_json_path}/survey.json'
+                # there may be a survey.json on the camera but not yet on the computer
+                # if so copy it
+                if file_ops.exists(source_survey_file) and not os.path.exists(survey_file):
+                    os.makedirs(full_survey_json_path, exist_ok=True)
+                    file_ops.copyfile(source_survey_file, survey_file)
 
-            if os.path.exists(survey_file):
-                survey = read_json_file(survey_file)
-            else:
-                survey = None
+                if os.path.exists(survey_file):
+                    survey = read_json_file(survey_file)
+                else:
+                    survey = None
 
-            if survey is None:
-                survey = {"reef": "", "site": "",
-                          "operator": default_operator, "observer" : default_observer,
-                          "vessel": default_vessel
-                          }
+                if survey is None:
+                    survey = {"reef": "", "site": "",
+                              "operator": default_operator, "observer" : default_observer,
+                              "vessel": default_vessel
+                              }
 
-            if not dict_has (survey, "operator"):
-                survey["operator"] = default_operator
+                if not dict_has(survey, "operator"):
+                    survey["operator"] = default_operator
 
-            if not dict_has (survey, "observer"):
-                survey["observer"] = default_observer
+                if not dict_has(survey, "observer"):
+                    survey["observer"] = default_observer
 
-            if not dict_has (survey, "vessel"):
-                survey["vessel"] = default_vessel
+                if not dict_has(survey, "vessel"):
+                    survey["vessel"] = default_vessel
 
-            if samba or slow_network:
-                has_photos = True
-            else:
-                has_photos = get_stats_from_photos(file_ops, full_survey_image_path, survey)
+                if samba or slow_network:
+                    has_photos = True
+                else:
+                    has_photos = get_stats_from_photos(file_ops, full_survey_image_path, survey)
 
-            survey["id"] = survey_image_folder
-            survey["json_folder"] = full_survey_json_path
-            survey["image_folder"] = full_survey_image_path
-            survey["samba"] = samba
-            if has_photos:
-                data[survey["id"]] = survey
-            progress_queue.set_progress_value()
+                survey["id"] = survey_image_folder
+                survey["json_folder"] = full_survey_json_path
+                survey["image_folder"] = full_survey_image_path
+                survey["samba"] = samba
+                if has_photos:
+                    data[survey["id"]] = survey
+                progress_queue.set_progress_value()
     return data
-
-
-
-
-
-
-
 
 
 def get_stats_from_photos(file_ops, full_path, survey):
@@ -125,17 +119,25 @@ def get_stats_from_photos(file_ops, full_path, survey):
 
     try:
         if count_photos > 0:
-            first_photo = f'{full_path}/{photos[0]}'
-            start_exif = get_exif_data(first_photo, False)
-            last_photo = f'{full_path}/{photos[len(photos) - 1]}'
-            finish_exif = get_exif_data(last_photo, False)
             survey["photos"] = count_photos
-            survey["start_date"] = start_exif["date_taken"]
-            survey["start_lat"] = start_exif["latitude"]
-            survey["start_lon"] = start_exif["longitude"]
-            survey["finish_date"] = finish_exif["date_taken"]
-            survey["finish_lat"] = finish_exif["latitude"]
-            survey["finish_lon"] = finish_exif["longitude"]
+            last_photo_index = len(photos) - 1
+            photo_index = 0
+            while (survey["start_lat"] is None or survey["start_lat"] == "") and photo_index < last_photo_index:
+                first_photo = f'{full_path}/{photos[photo_index]}'
+                start_exif = get_exif_data(first_photo, False)
+                survey["start_date"] = start_exif["date_taken"]
+                survey["start_lat"] = start_exif["latitude"]
+                survey["start_lon"] = start_exif["longitude"]
+                photo_index += 1
+
+            photo_index = last_photo_index
+            while (survey["finish_lat"] is None or survey["finish_lat"] == "") and photo_index > 0:
+                last_photo = f'{full_path}/{photos[photo_index]}'
+                finish_exif = get_exif_data(last_photo, False)
+                survey["finish_date"] = finish_exif["date_taken"]
+                survey["finish_lat"] = finish_exif["latitude"]
+                survey["finish_lon"] = finish_exif["longitude"]
+                photo_index -= 1
     except Exception as e:
         logger.warning("Error getting metadata for folder " + full_path, e)
 

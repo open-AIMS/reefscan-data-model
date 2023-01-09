@@ -17,10 +17,10 @@ def make_photo_csv(folder):
     df = pd.DataFrame()
     for photo in photos:
         exif = exif_utils.get_exif_data(folder + "/" + photo, open_photo_if_needed=False)
-        df = df.append({"filename":photo, "latitude": exif["latitude"], "longitude": exif["longitude"],
+        df = df.append({"filename_string":photo, "latitude": exif["latitude"], "longitude": exif["longitude"],
                         "date_taken": exif["date_taken"]}, ignore_index=True)
 
-    df.sort_values(by=["date_taken", "filename"])
+    df.sort_values(by=["date_taken", "filename_string"])
     df.to_csv(csv_file_name, index=False)
     return df
 
@@ -32,19 +32,21 @@ def track(folder, samba):
         with file_ops.open(csv_file_name) as file:
             df = pd.read_csv(file)
     else:
-        if not samba:
-            df = make_photo_csv(folder)
-        else:
-            return None
+        raise Exception("No photo log found.")
+        # if not samba:
+        #     df = make_photo_csv(folder)
+        # else:
+        #     return None
 
-    t = df[["latitude", "longitude"]].values.tolist()
+    t = df[["latitude", "longitude", "filename_string"]]
+    t = t[pd.to_numeric(t['latitude'], errors='coerce').notnull()]
+    t.filename_string = folder + "/" +  t.filename_string
+    t = t.values.tolist()
+    t = t[0:10]
     return t
 
 
 # tt = track("C:/aims/reef-scanner/images/20210727_232530_Seq01")
 # print(str(tt))
-
-
-
 
 

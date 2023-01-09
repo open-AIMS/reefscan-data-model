@@ -49,18 +49,22 @@ class BasicModel(object):
             raise Exception("Error can't find local files")
 
         if camera_connected:
-            progress_queue.reset()
-            progress_queue.set_progress_label("Reading data from camera")
-            try:
-                self.camera_surveys = self.read_surveys(progress_queue, self.camera_data_folder, self.data_folder,
-                                                        self.camera_samba, False)
-            except:
-                raise Exception("Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera.")
+            self.load_camera_data(progress_queue)
 
         # finish = datetime.datetime.now()
         # delta = finish - start
         # print("time taken")
         # print(delta)
+
+    def load_camera_data(self, progress_queue):
+        progress_queue.reset()
+        progress_queue.set_progress_label("Reading data from camera")
+        try:
+            self.camera_surveys = self.read_surveys(progress_queue, self.camera_data_folder, self.data_folder,
+                                                    self.camera_samba, False)
+        except:
+            raise Exception(
+                "Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera.")
 
     def read_surveys(self, progress_queue: ProgressQueue, image_folder, json_folder, samba, slow_network):
         logger.info("start read surveys")
@@ -95,3 +99,4 @@ class BasicModel(object):
         df = self.combined_df()
 
         df.to_csv(csv_file, index=False)
+

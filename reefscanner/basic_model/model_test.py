@@ -1,7 +1,10 @@
 import logging
 
+from pytz import timezone
+
 from reefscanner.archive_stats.archive_stats import ArchiveStats
 from reefscanner.basic_model.basic_model import BasicModel
+from reefscanner.basic_model.model_helper import check_model, rename_folders
 from reefscanner.basic_model.progress_no_queue import ProgressNoQueue
 from reefscanner.basic_model.progress_queue import ProgressQueue
 
@@ -27,24 +30,28 @@ basic_model = BasicModel()
 
 progress_queue = ProgressNoQueue()
 # basic_model.set_data_folders("D:/Trip7785_DaviesReef_CoralAUV_ReefScanTesting/ReefScan", "")
-basic_model.set_data_folders("E:/heron_island_tech_2022", r"\\192.168.3.2\images")
-# basic_model.set_data_folders("c:/temp/reefscan", r"\\192.168.1.254\images")
+# basic_model.set_data_folders("E:/heron_island_tech_2022", r"\\192.168.3.2\images")
+primary_data_folder = "E:/Trip8004_CCIPOdysseyWhitsundaysDec2022/ReefScanTransomData"
+backup_data_folder = "c:/temp/reefscan-backup"
+basic_model.set_data_folders(primary_data_folder, r"\\192.168.3.2\images")
 
 basic_model.slow_network = False
-basic_model.read_from_files(progress_queue, camera_connected=True)
+basic_model.read_from_files(progress_queue, camera_connected=False)
 # basic_model.new_method()
 
 logger.info("done")
 
 logger.info(basic_model.surveys_data)
 
-basic_model.export()
+# check_model(basic_model)
+# rename_folders(model=basic_model, primary_folder=primary_data_folder, backup_folder=backup_data_folder, local_tz=timezone("Australia/Brisbane"))
+# basic_model.export()
 
-archive_stats = ArchiveStats()
+# archive_stats = ArchiveStats()
 
-archive_stats.get_archive_stats(basic_model)
-print("archive")
-print(archive_stats.to_string())
+# archive_stats.get_archive_stats(basic_model)
+# print("archive")
+# print(archive_stats.to_string())
 
 
 
