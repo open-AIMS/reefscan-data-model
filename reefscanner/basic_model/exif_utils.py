@@ -22,12 +22,16 @@ def get_exif_data(photo, open_photo_if_needed):
             width=None
             height=None
     try:
+        subject_distance = get_decimal_from_fraction(exif_dict["Exif"][piexif.ExifIFD.SubjectDistance])
+    except:
+        subject_distance = None
+    try:
         gps = exif_dict["GPS"]
-        (lat, lon, date1) = get_coordinates(gps)
+        (lat, lon, date1, altitude) = get_coordinates(gps)
     except Exception as e:
         raise Exception("Can't get exif data for " + photo, e)
 
-    return {"latitude": lat, "longitude": lon, "date_taken": date1, "width": width, "height": height}
+    return {"latitude": lat, "longitude": lon, "date_taken": date1, "altitude": altitude, "subject_distance": subject_distance, "width": width, "height": height}
 
 
 def get_coordinates(geotags):
@@ -39,6 +43,12 @@ def get_coordinates(geotags):
         lon = get_decimal_from_dms(geotags[piexif.GPSIFD.GPSLongitude], geotags[piexif.GPSIFD.GPSLongitudeRef])
     except:
         lon = None
+
+    try:
+        altitude = get_decimal_from_fraction(geotags[piexif.GPSIFD.GPSAltitude])
+    except:
+        altitude = None
+
     try:
         date = geotags[piexif.GPSIFD.GPSDateStamp]
         date = "".join(map(chr, date))
@@ -53,13 +63,13 @@ def get_coordinates(geotags):
         date1 = date[0:4] + "-" + date[5:7] + "-" + date[8:10] + "T" + date[11:20]
     except:
         date1 = None
-    return (lat, lon, date1)
+    return (lat, lon, date1, altitude)
 
 
 def get_decimal_from_dms(dms, ref):
-    degrees = dms[0][0] / dms[0][1]
-    minutes = dms[1][0] / dms[1][1] / 60.0
-    seconds = dms[2][0] / dms[2][1] / 3600.0
+    degrees = get_decimal_from_fraction(dms[0])
+    minutes = get_decimal_from_fraction(dms[1]) / 60.0
+    seconds = get_decimal_from_fraction(dms[2])/ 3600.0
 
     if ref in [b'S', b'W', 'S', 'W']:
         degrees = -degrees
@@ -67,3 +77,9 @@ def get_decimal_from_dms(dms, ref):
         seconds = -seconds
 
     return round(degrees + minutes + seconds, 5)
+
+
+def get_decimal_from_fraction(fraction):
+    return fraction[0] / fraction[1]
+
+

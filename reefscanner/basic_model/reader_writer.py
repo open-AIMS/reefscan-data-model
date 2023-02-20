@@ -24,7 +24,11 @@ def save_survey(survey, primary_folder, backup_folder):
     # survey_to_save.pop("finish_lon")
     survey_to_save.pop("samba")
     write_json_file(json_folder, 'survey.json', survey_to_save)
-    write_json_file(backup_json_folder, 'survey.json', survey_to_save)
+    try:
+        write_json_file(backup_json_folder, 'survey.json', survey_to_save)
+    except:
+        pass
+
 
 
 def dict_has(dict, column):
