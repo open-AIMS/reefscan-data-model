@@ -97,10 +97,10 @@ class BasicModel(object):
 
     def export(self):
         csv_file = self.data_folder + "/surveys.csv"
-        backup_csv_file = self.backup_folder + "/surveys.csv"
         print("export to " + csv_file)
         df = self.combined_df()
-
         df.to_csv(csv_file, index=False)
-        shutil.copy2(csv_file, backup_csv_file)
+        if self.backup_folder is not None:
+            backup_csv_file = self.backup_folder + "/surveys.csv"
+            shutil.copy2(csv_file, backup_csv_file)
 
