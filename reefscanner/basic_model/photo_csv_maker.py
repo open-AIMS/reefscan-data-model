@@ -42,11 +42,11 @@ def track(folder, samba):
     t = t[pd.to_numeric(t['latitude'], errors='coerce').notnull()]
     t.filename_string = folder + "/" +  t.filename_string
     t = t.values.tolist()
-    t = t[0:10]
+    t = t[::20]
     return t
 
 
-# tt = track("C:/aims/reef-scanner/images/20210727_232530_Seq01")
-# print(str(tt))
+tt = track("F:/reefscan/2023-03-13/20230313_075757_Seq01-Ugar-ugar dive site 2", False)
+print(str(tt))
 
 

@@ -13,7 +13,7 @@ def check_model(model):
     names = set()
     for folder in model.surveys_data.keys():
         survey = model.surveys_data[folder]
-        friendly_name = survey["friendly_name"]
+        friendly_name = survey.friendly_name
         if friendly_name is not None and friendly_name != "":
             if friendly_name in names:
                 raise Exception(f"Duplicate Name {friendly_name}")
@@ -27,28 +27,25 @@ def rename_folders(model: BasicModel, local_tz):
     for folder in model.surveys_data.keys():
         survey = model.surveys_data[folder]
 
-        try:
-            friendly_name = survey["friendly_name"]
-        except:
+        friendly_name = survey.friendly_name
+        if friendly_name is None:
             friendly_name = ""
-
-        if friendly_name != "":
+        else:
             friendly_name = f"-{friendly_name}"
-        try:
-            site = survey["site"]
-        except:
-            site = ""
 
-        if site != "":
+        site = survey.site
+        if site is None:
+            site = ""
+        else:
             site = f"-{site}"
 
-        id = survey["id"]
+        id = survey.id
         new_folder = f"{id}{site}{friendly_name}"
 
-        old_primary_survey_folder = survey.pop('json_folder')
+        old_primary_survey_folder = survey.folder
 
         try:
-            start_date = survey["start_date"]
+            start_date = survey.start_date
             naive_date = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
             utc_date = utc.localize(naive_date)
             local_date = utc_date.astimezone(local_tz)

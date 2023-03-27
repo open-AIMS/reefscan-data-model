@@ -16,3 +16,5 @@ def write_json_file(folder, filename, dict):
     full_filename = f'{folder}/{filename}'
     with open(full_filename, "w") as file:
         file.write(jsonStr)
+
+
