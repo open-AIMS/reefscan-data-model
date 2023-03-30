@@ -46,7 +46,4 @@ def track(folder, samba):
     return t
 
 
-tt = track("F:/reefscan/2023-03-13/20230313_075757_Seq01-Ugar-ugar dive site 2", False)
-print(str(tt))
-
 
