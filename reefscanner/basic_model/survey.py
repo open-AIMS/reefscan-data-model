@@ -3,7 +3,7 @@ from reefscanner.basic_model.survey_reefcloud_info import ReefcloudUploadInfo
 
 class Survey(object):
     def __init__(self, survey_json):
-        self.id: int = survey_json.get("id")
+        self.id: str = survey_json.get("id")
         self.friendly_name: str = survey_json.get("friendly_name")
         self.samba: bool = survey_json.get("samba")
         self.folder: str = survey_json.get("folder")
@@ -64,7 +64,7 @@ class Survey(object):
         return r
 
     def best_name(self):
-        if self.friendly_name is None:
+        if self.friendly_name is None or self.friendly_name == "":
             return self.id
         else:
             return self.friendly_name

@@ -1,3 +1,4 @@
+import math
 import os
 from reefscanner.basic_model import exif_utils
 import pandas as pd
@@ -42,7 +43,8 @@ def track(folder, samba):
     t = t[pd.to_numeric(t['latitude'], errors='coerce').notnull()]
     t.filename_string = folder + "/" +  t.filename_string
     t = t.values.tolist()
-    t = t[::20]
+    interval = math.ceil(len(t)/200)
+    t = t[::interval]
     return t
 
 
