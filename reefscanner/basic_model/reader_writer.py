@@ -102,9 +102,10 @@ def read_survey_data(base_folder,
             survey.folder = full_survey_path
             survey.samba = samba
 
-            if survey.id is None and not samba:
+            if survey.id is None:
                 survey.id = os.path.basename(full_survey_path)
-                save_survey(survey, base_folder, backup_folder, samba)
+                if not samba:
+                    save_survey(survey, base_folder, backup_folder, samba)
             if has_photos:
                 data[survey.id] = survey
             progress_queue.set_progress_value()
