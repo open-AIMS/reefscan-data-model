@@ -157,6 +157,7 @@ def get_stats_from_photos(file_ops, full_path, survey, full):
                 survey.start_date = start_exif["date_taken"]
                 survey.start_lat = start_exif["latitude"]
                 survey.start_lon = start_exif["longitude"]
+                survey.start_depth = start_exif["altitude"]
                 photo_index += 1
 
             photo_index = last_photo_index
@@ -166,6 +167,7 @@ def get_stats_from_photos(file_ops, full_path, survey, full):
                 survey.finish_date = finish_exif["date_taken"]
                 survey.finish_lat = finish_exif["latitude"]
                 survey.finish_lon = finish_exif["longitude"]
+                survey.finish_depth = finish_exif["altitude"]
                 photo_index -= 1
     except Exception as e:
         logger.warning("Error getting metadata for folder " + full_path, e)

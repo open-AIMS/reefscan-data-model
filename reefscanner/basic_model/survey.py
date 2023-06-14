@@ -17,6 +17,8 @@ class Survey(object):
         self.finish_lat = None
         self.finish_lon = None
         self.time_name = None
+        self.start_depth = None
+        self.finish_depth = None
 
         self.operator: str = survey_json.get("operator")
         self.observer: str = survey_json.get("observer")
