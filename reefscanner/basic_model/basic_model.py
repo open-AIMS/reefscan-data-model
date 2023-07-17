@@ -43,12 +43,13 @@ class BasicModel(object):
         self.camera_json_folder = data_folder.replace("/reefscan/", "/reefscan_camera_surveys/")
         self.backup_folder = backup_folder
 
-    def read_from_files(self, progress_queue: ProgressQueue, camera_connected):
+    def read_from_files(self, progress_queue: ProgressQueue, camera_connected,
+                        message="Reading data from local file system", error_message="Error can't find local files"):
         logger.info("start read from files")
         start = datetime.datetime.now()
 
         progress_queue.reset()
-        progress_queue.set_progress_label("Reading data from local file system")
+        progress_queue.set_progress_label(message)
         try:
             self.surveys_data = self.read_surveys(progress_queue, self.data_folder,
                                                   self.backup_folder,
@@ -57,14 +58,15 @@ class BasicModel(object):
             self.local_data_loaded = True
 
         except:
-            raise Exception("Error can't find local files")
+            raise Exception(error_message)
 
         if camera_connected:
             self.load_camera_data(progress_queue)
 
-    def load_camera_archive_data(self, progress_queue):
+    def load_camera_archive_data(self, progress_queue, message="Reading data from camera",
+                                 error_message="Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera."):
         progress_queue.reset()
-        progress_queue.set_progress_label("Reading data from camera")
+        progress_queue.set_progress_label(message)
         try:
             self.archived_surveys = self.read_surveys(progress_queue, f"{self.camera_data_folder}/archive",
                                                     None,
@@ -73,11 +75,12 @@ class BasicModel(object):
 
         except:
             raise Exception(
-                "Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera.")
+                error_message)
 
-    def load_camera_data(self, progress_queue):
+    def load_camera_data(self, progress_queue, message="Reading data from camera",
+                         error_message="Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera."):
         progress_queue.reset()
-        progress_queue.set_progress_label("Reading data from camera")
+        progress_queue.set_progress_label(message)
         try:
             self.camera_surveys = self.read_surveys(progress_queue, self.camera_data_folder,
                                                     None,
@@ -85,7 +88,7 @@ class BasicModel(object):
             self.camera_data_loaded = True
         except:
             raise Exception(
-                "Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera.")
+                error_message)
 
     def read_surveys(self, progress_queue: ProgressQueue, image_folder,
                      backup_folder, samba, slow_network):

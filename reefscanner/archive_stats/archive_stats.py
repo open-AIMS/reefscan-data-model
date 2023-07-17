@@ -14,6 +14,13 @@ class ArchiveStats:
         self.counting = True
         self.cancelled = False
 
+    def available_size(self):
+        if self.space is None:
+            return 0
+        else:
+            return self.space.actual_available_size
+
+
     def to_string(self):
         if self.cancelled:
             return "cancelled"
