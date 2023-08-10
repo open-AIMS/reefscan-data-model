@@ -15,11 +15,13 @@ def make_photo_csv(folder):
 
     photos = [name for name in os.listdir(folder) if name.lower().endswith(".jpg")]
 
-    df = pd.DataFrame()
+    dicts = []
     for photo in photos:
         exif = exif_utils.get_exif_data(folder + "/" + photo, open_photo_if_needed=False)
-        df = df.append({"filename_string":photo, "latitude": exif["latitude"], "longitude": exif["longitude"],
-                        "date_taken": exif["date_taken"]}, ignore_index=True)
+        dicts.append({"filename_string":photo, "latitude": exif["latitude"], "longitude": exif["longitude"],
+                        "date_taken": exif["date_taken"]})
+
+    df = pd.DataFrame.from_dict(dicts)
 
     df.sort_values(by=["date_taken", "filename_string"])
     df.to_csv(csv_file_name, index=False)
@@ -41,6 +43,9 @@ def track(folder, samba):
 
     t = df[["latitude", "longitude", "filename_string"]]
     t = t[pd.to_numeric(t['latitude'], errors='coerce').notnull()]
+    t = t[pd.to_numeric(t['longitude'], errors='coerce').notnull()]
+    t = t[pd.to_numeric(t['latitude'], errors='coerce') != 0]
+    t = t[pd.to_numeric(t['longitude'], errors='coerce') != 0]
     t.filename_string = folder + "/" +  t.filename_string
     t = t.values.tolist()
     interval = math.ceil(len(t)/200)
@@ -48,4 +53,5 @@ def track(folder, samba):
     return t
 
 
-
+if __name__ == "__main__":
+    make_photo_csv("F:/reefscan/HeronHarbourMantaTowReefScanTransects/20230726_000540Tow_01")
