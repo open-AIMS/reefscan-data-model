@@ -51,7 +51,7 @@ class ArchiveStats:
 
         return s
 
-    def get_archive_stats(self, model):
+    def get_archive_stats(self, model, hardware_folder=r"\\192.168.3.2\images"):
         self.__init__()
         archive_folder = model.camera_data_folder + "/archive"
         samba_file_ops = get_file_ops(True)
@@ -93,7 +93,7 @@ class ArchiveStats:
             else:
                 archive_survey_stats.status = "different"
 
-        self.space = smbclient._os.stat_volume(r"\\192.168.3.2\images")
+        self.space = smbclient._os.stat_volume(hardware_folder)
 
         # self.archive_size = 0.0
         # for archive_survey_stats in self.surveys:
