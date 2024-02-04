@@ -1,7 +1,7 @@
 import datetime
 import os
 import logging
-
+from aims import utils
 from pytz import utc
 
 from reefscanner.basic_model.basic_model import BasicModel
@@ -65,6 +65,26 @@ def rename_folders(model: BasicModel, local_tz):
         new_primary_survey_folder = f"{primary_folder}/{new_relative_survey_folder}"
         rename_folder(old_primary_survey_folder, new_primary_survey_folder)
 
+        enhanced_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_enhanced/")
+        enhanced_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_enhanced/")
+        rename_folder(enhanced_folder, enhanced_folder_new)
+
+        cache_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_cache/")
+        cache_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_cache/")
+        rename_folder(cache_folder, cache_folder_new)
+
+        eod_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_eod_cots/")
+        eod_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_eod_cots/")
+        rename_folder(eod_folder, eod_folder_new)
+
+        thumbnails_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_thumbnails/")
+        thumbnails_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_thumbnails/")
+        rename_folder(thumbnails_folder, thumbnails_folder_new)
+
+        inference_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_inference/")
+        inference_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_inference/")
+        rename_folder(inference_folder, inference_folder_new)
+
         if backup_folder is not None:
             old_backup_survey_folder = old_primary_survey_folder.replace(primary_folder, backup_folder)
             new_backup_survey_folder = f"{backup_folder}/{new_relative_survey_folder}"
@@ -72,6 +92,9 @@ def rename_folders(model: BasicModel, local_tz):
 
 
 def rename_folder(old_folder, new_folder):
-    if old_folder != new_folder:
-        print(f"os.rename({old_folder}, {new_folder})")
-        os.rename(old_folder, new_folder)
+    if os.path.exists(old_folder):
+        if old_folder != new_folder:
+            dir = os.path.dirname(new_folder)
+            os.makedirs(dir, exist_ok=True)
+            print(f"os.rename({old_folder}, {new_folder})")
+            os.rename(old_folder, new_folder)
