@@ -2,6 +2,8 @@ import logging
 import shutil
 from datetime import datetime
 import datetime
+from time import process_time
+
 import pandas as pd
 
 import shortuuid
@@ -45,7 +47,8 @@ class BasicModel(object):
 
     def read_from_files(self, progress_queue: ProgressQueue, camera_connected,
                         message="Reading data from local file system", error_message="Error can't find local files"):
-        logger.info("start read from files")
+        logger.info(f"start read from files {process_time()}")
+
         start = datetime.datetime.now()
 
         progress_queue.reset()
@@ -54,7 +57,8 @@ class BasicModel(object):
             self.surveys_data = self.read_surveys(progress_queue, self.data_folder,
                                                   self.backup_folder,
                                                   self.local_samba,
-                                                  self.slow_network)
+                                                  self.slow_network,
+                                                  message)
             self.local_data_loaded = True
 
         except:
@@ -70,7 +74,7 @@ class BasicModel(object):
         try:
             self.archived_surveys = self.read_surveys(progress_queue, f"{self.camera_data_folder}/archive",
                                                     None,
-                                                    self.camera_samba, False)
+                                                    self.camera_samba, False, message=message)
             self.archived_data_loaded = True
 
         except:
@@ -81,21 +85,23 @@ class BasicModel(object):
                          error_message="Error can't find camera. Make sure the computer is connected to the camera via an ethernet cable. You may need to restart the camera."):
         progress_queue.reset()
         progress_queue.set_progress_label(message)
+        logger.info(f"message {message} {process_time()}")
+
         try:
             self.camera_surveys = self.read_surveys(progress_queue, self.camera_data_folder,
                                                     None,
-                                                    self.camera_samba, False)
+                                                    self.camera_samba, False, message)
             self.camera_data_loaded = True
         except:
             raise Exception(
                 error_message)
 
     def read_surveys(self, progress_queue: ProgressQueue, image_folder,
-                     backup_folder, samba, slow_network):
-        logger.info("start read surveys")
+                     backup_folder, samba, slow_network, message):
+        logger.info(f"start read surveys {process_time()}")
 
         surveys_data = read_survey_data(image_folder, backup_folder,
-                                        progress_queue=progress_queue, samba=samba, slow_network=slow_network)
+                                        progress_queue=progress_queue, samba=samba, slow_network=slow_network, message=message)
         logger.info("finish read surveys")
 
         return surveys_data

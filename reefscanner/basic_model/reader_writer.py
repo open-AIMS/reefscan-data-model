@@ -3,6 +3,7 @@ import glob
 import logging
 import os
 import tempfile
+from time import process_time
 
 from reefscanner.archive_stats.archive_stats import ArchiveStats
 from reefscanner.archive_stats.archive_survey_stats import ArchiveSurveyStats
@@ -74,7 +75,10 @@ def find_surveys_camera(base_folder, file_ops):
 
 def read_survey_data(base_folder,
                      backup_folder,
-                     progress_queue: ProgressQueue, samba, slow_network):
+                     progress_queue: ProgressQueue, samba, slow_network, message):
+
+    progress_queue.set_progress_label("Counting Files")
+    logger.info(f"message Counting Files {process_time()}")
 
     file_ops = get_file_ops(samba)
     if base_folder is None:
@@ -90,6 +94,7 @@ def read_survey_data(base_folder,
             survey_folders = find_surveys_local_disk(base_folder, file_ops)
 
     progress_queue.set_progress_max(len(survey_folders) + 1)
+    progress_queue.set_progress_label(message)
     for full_survey_path in survey_folders:
         if file_ops.isdir(full_survey_path):
             survey_file = f'{full_survey_path}/survey.json'
@@ -142,10 +147,14 @@ def read_survey_file(survey_file, samba: bool):
 
 
 def get_stats_from_photos(file_ops, full_path, survey, full):
-    photos = [name for name in file_ops.listdir(full_path) if name.lower().endswith(".jpg") or name.lower().endswith(".jpeg")]
+    files = file_ops.listjpegsfast(full_path)
+    photos = [name for name in files if name.lower().endswith(".jpg") or name.lower().endswith(".jpeg")]
     photos.sort()
     count_photos = len(photos)
-    survey.photos = count_photos
+    if not full and count_photos > 1000:
+        survey.photos = ">1000"
+    else:
+        survey.photos = count_photos
 
     try:
         if full and count_photos > 0:

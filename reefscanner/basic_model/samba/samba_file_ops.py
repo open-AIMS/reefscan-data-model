@@ -1,6 +1,8 @@
 import smbclient
 from smbclient import path, shutil
 
+from reefscanner.basic_model.model_utils import samba_listdir
+
 
 class SambaFileOps:
     def __init__(self):
@@ -9,6 +11,9 @@ class SambaFileOps:
     def file_size_mb(self, file):
         # return smbclient.path.getsize(file)/1000000
         return smbclient.lstat(file).st_size/1000000
+
+    def listjpegsfast(self, dir):
+        return samba_listdir(dir)
 
     def listdir(self, dir):
         return smbclient._os.listdir(dir)

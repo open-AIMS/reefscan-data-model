@@ -70,3 +70,4 @@ class Survey(object):
             return self.id
         else:
             return self.friendly_name
+

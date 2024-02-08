@@ -1,9 +1,9 @@
 import datetime
 import os
 import logging
-from aims import utils
 from pytz import utc
 
+from reefscanner.basic_model import model_utils
 from reefscanner.basic_model.basic_model import BasicModel
 from reefscanner.basic_model.reader_writer import save_survey
 logger = logging.getLogger(__name__)
@@ -65,24 +65,24 @@ def rename_folders(model: BasicModel, local_tz):
         new_primary_survey_folder = f"{primary_folder}/{new_relative_survey_folder}"
         rename_folder(old_primary_survey_folder, new_primary_survey_folder)
 
-        enhanced_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_enhanced/")
-        enhanced_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_enhanced/")
+        enhanced_folder = model_utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_enhanced/")
+        enhanced_folder_new = model_utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_enhanced/")
         rename_folder(enhanced_folder, enhanced_folder_new)
 
-        cache_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_cache/")
-        cache_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_cache/")
+        cache_folder = model_utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_cache/")
+        cache_folder_new = model_utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_cache/")
         rename_folder(cache_folder, cache_folder_new)
 
-        eod_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_eod_cots/")
-        eod_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_eod_cots/")
+        eod_folder = model_utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_eod_cots/")
+        eod_folder_new = model_utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_eod_cots/")
         rename_folder(eod_folder, eod_folder_new)
 
-        thumbnails_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_thumbnails/")
-        thumbnails_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_thumbnails/")
+        thumbnails_folder = model_utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_thumbnails/")
+        thumbnails_folder_new = model_utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_thumbnails/")
         rename_folder(thumbnails_folder, thumbnails_folder_new)
 
-        inference_folder = utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_inference/")
-        inference_folder_new = utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_inference/")
+        inference_folder = model_utils.replace_last(old_primary_survey_folder, "/reefscan/", "/reefscan_inference/")
+        inference_folder_new = model_utils.replace_last(new_primary_survey_folder, "/reefscan/", "/reefscan_inference/")
         rename_folder(inference_folder, inference_folder_new)
 
         if backup_folder is not None:

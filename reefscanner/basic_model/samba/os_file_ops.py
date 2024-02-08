@@ -11,6 +11,9 @@ class OsFileOps:
     def listdir(self, dir):
         return os.listdir(dir)
 
+    def listjpegsfast(self, dir):
+        return os.listdir(dir)
+
     def isdir(self, dir):
         return os.path.isdir(dir)
 
