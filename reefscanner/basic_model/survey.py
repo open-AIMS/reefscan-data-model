@@ -55,6 +55,7 @@ class Survey(object):
                 "observer": self.observer,
                 "sea": self.sea,
                 "wind": self.wind,
+                "wind_direction": self.wind_direction,
                 "cloud": self.cloud,
                 "visibility": self.visibility,
                 "tide": self.tide,
