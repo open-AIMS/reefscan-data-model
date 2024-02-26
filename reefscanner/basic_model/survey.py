@@ -25,6 +25,7 @@ class Survey(object):
         self.vessel: str = survey_json.get("operator")
         self.sea: str = survey_json.get("sea")
         self.wind: str = survey_json.get("wind")
+        self.wind_direction: str = survey_json.get("wind_direction")
         self.cloud: str = survey_json.get("cloud")
         self.visibility: str = survey_json.get("visibility")
         self.tide: str = survey_json.get("tide")
