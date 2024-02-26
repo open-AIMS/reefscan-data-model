@@ -24,8 +24,14 @@ class Survey(object):
         self.observer: str = survey_json.get("observer")
         self.vessel: str = survey_json.get("operator")
         self.sea: str = survey_json.get("sea")
-        self.wind: str = survey_json.get("wind")
+
+        if 'wind_speed' in survey_json:
+            self.wind_speed: str = survey_json.get("wind_speed")
+        else:
+            self.wind_speed: str = survey_json.get("wind")
+
         self.wind_direction: str = survey_json.get("wind_direction")
+
         self.cloud: str = survey_json.get("cloud")
         self.visibility: str = survey_json.get("visibility")
         self.tide: str = survey_json.get("tide")
@@ -54,7 +60,7 @@ class Survey(object):
                 "operator": self.operator,
                 "observer": self.observer,
                 "sea": self.sea,
-                "wind": self.wind,
+                "wind_speed": self.wind_speed,
                 "wind_direction": self.wind_direction,
                 "cloud": self.cloud,
                 "visibility": self.visibility,
