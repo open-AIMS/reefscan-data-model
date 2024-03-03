@@ -41,7 +41,7 @@ def track(folder, samba):
         # else:
         #     return None
 
-    t = df[["latitude", "longitude", "filename_string"]]
+    t = df[["latitude", "longitude", "filename_string", "ping_depth"]]
     t = t[pd.to_numeric(t['latitude'], errors='coerce').notnull()]
     t = t[pd.to_numeric(t['longitude'], errors='coerce').notnull()]
     t = t[pd.to_numeric(t['latitude'], errors='coerce') != 0]
