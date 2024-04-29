@@ -1,3 +1,4 @@
+import csv
 import datetime
 import glob
 import logging
@@ -75,7 +76,7 @@ def find_surveys_camera(base_folder, file_ops):
 
 def read_survey_data(base_folder,
                      backup_folder,
-                     progress_queue: ProgressQueue, samba, slow_network, message):
+                     progress_queue: ProgressQueue, samba, slow_network, message, archive=False):
 
     progress_queue.set_progress_label("Counting Files")
     logger.info(f"message Counting Files {process_time()}")
@@ -102,7 +103,10 @@ def read_survey_data(base_folder,
             survey = read_survey_file(survey_file, samba)
 
             full_stats = not (samba or slow_network)
-            has_photos = get_stats_from_photos(file_ops, full_survey_path, survey, full_stats)
+            if archive:
+                has_photos = True
+            else:
+                has_photos = get_stats_from_photos(file_ops, full_survey_path, survey, full_stats)
 
             survey.folder = full_survey_path
             survey.samba = samba
@@ -160,13 +164,15 @@ def get_stats_from_photos(file_ops, full_path, survey, full):
         if full and count_photos > 0:
             last_photo_index = len(photos) - 1
             photo_index = 0
-            while survey.start_lat is None and photo_index < last_photo_index:
+            photo_name = "2000"
+            while (survey.start_lat is None or photo_name < "2020") and photo_index < last_photo_index:
                 first_photo = f'{full_path}/{photos[photo_index]}'
                 start_exif = get_exif_data(first_photo, False)
                 survey.start_date = start_exif["date_taken"]
                 survey.start_lat = start_exif["latitude"]
                 survey.start_lon = start_exif["longitude"]
                 survey.start_depth = start_exif["altitude"]
+                photo_name = photos[photo_index]
                 photo_index += 1
 
             photo_index = last_photo_index
@@ -178,9 +184,8 @@ def get_stats_from_photos(file_ops, full_path, survey, full):
                 survey.finish_lon = finish_exif["longitude"]
                 survey.finish_depth = finish_exif["altitude"]
                 photo_index -= 1
+
     except Exception as e:
         logger.warning("Error getting metadata for folder " + full_path, e)
 
     return count_photos > 0
-
-

@@ -74,7 +74,7 @@ class BasicModel(object):
         try:
             self.archived_surveys = self.read_surveys(progress_queue, f"{self.camera_data_folder}/archive",
                                                     None,
-                                                    self.camera_samba, False, message=message)
+                                                    self.camera_samba, False, message=message, archive=True)
             self.archived_data_loaded = True
 
         except:
@@ -97,11 +97,11 @@ class BasicModel(object):
                 error_message)
 
     def read_surveys(self, progress_queue: ProgressQueue, image_folder,
-                     backup_folder, samba, slow_network, message):
+                     backup_folder, samba, slow_network, message, archive=False):
         logger.info(f"start read surveys {process_time()}")
 
         surveys_data = read_survey_data(image_folder, backup_folder,
-                                        progress_queue=progress_queue, samba=samba, slow_network=slow_network, message=message)
+                                        progress_queue=progress_queue, samba=samba, slow_network=slow_network, message=message, archive=archive)
         logger.info("finish read surveys")
 
         return surveys_data
