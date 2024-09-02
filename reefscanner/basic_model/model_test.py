@@ -34,13 +34,13 @@ progress_queue = ProgressNoQueue()
 # basic_model.set_data_folders("E:/heron_island_tech_2022", r"\\192.168.3.2\images")
 primary_data_folder = "c:/reefscan"
 backup_data_folder = "c:/reefscan_backup"
-# basic_model.set_data_folders(primary_data_folder, backup_data_folder, r"\\192.168.3.2\images")
-basic_model.set_data_folders(primary_data_folder, backup_data_folder, r"\\10.42.0.1\images")
+basic_model.set_data_folders(primary_data_folder, backup_data_folder, r"\\192.168.3.2\images")
+# basic_model.set_data_folders(primary_data_folder, backup_data_folder, r"\\10.42.0.1\images")
 
 basic_model.slow_network = False
-# basic_model.read_from_files(progress_queue, camera_connected=False)
+basic_model.read_from_files(progress_queue, camera_connected=False)
 basic_model.load_camera_data(progress_queue)
-# basic_model.load_camera_archive_data(progress_queue)
+basic_model.load_camera_archive_data(progress_queue)
 
 for id in basic_model.camera_surveys:
     print(basic_model.camera_surveys[id].photos)

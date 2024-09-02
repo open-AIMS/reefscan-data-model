@@ -39,5 +39,8 @@ class SambaFileOps:
     def mkdir(self, dir):
         smbclient.mkdir(dir)
 
+    def makedirs(self, dir, exist_ok=True):
+        smbclient.makedirs(dir, exist_ok=exist_ok)
+
     def move(self, frm, to):
         smbclient.rename(frm, to)

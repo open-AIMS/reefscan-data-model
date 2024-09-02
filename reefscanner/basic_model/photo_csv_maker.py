@@ -19,7 +19,8 @@ def make_photo_csv(folder):
     for photo in photos:
         exif = exif_utils.get_exif_data(folder + "/" + photo, open_photo_if_needed=False)
         dicts.append({"filename_string":photo, "latitude": exif["latitude"], "longitude": exif["longitude"],
-                        "date_taken": exif["date_taken"]})
+                        "date_taken": exif["date_taken"], "ping_depth": exif["subject_distance"]
+                      })
 
     df = pd.DataFrame.from_dict(dicts)
 
@@ -35,11 +36,10 @@ def track(folder, samba):
         with file_ops.open(csv_file_name) as file:
             df = pd.read_csv(file)
     else:
-        raise Exception("No photo log found.")
-        # if not samba:
-        #     df = make_photo_csv(folder)
-        # else:
-        #     return None
+        if not samba:
+            df = make_photo_csv(folder)
+        else:
+            return None
 
     t = df[["latitude", "longitude", "filename_string", "ping_depth"]]
     t = t[pd.to_numeric(t['latitude'], errors='coerce').notnull()]

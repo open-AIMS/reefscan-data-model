@@ -3,6 +3,7 @@ import datetime
 import glob
 import logging
 import os
+import re
 import tempfile
 from time import process_time
 
@@ -47,14 +48,20 @@ def dict_has(dict, column):
     return True
 
 # search folder and all it's sub folders for surveys. We know it's a survey if the folder has has "survey.json"
-# Or maybe any folder with photos in it we should also include
+# or if it has subfolders such as cam_1
+# Or maybe any folder with photos in it we should also include (except cam_1, cam_2 etc)
 def find_surveys_local_disk(base_folder, file_ops):
     survey_image_folders = []
     for root, dirs, files in os.walk(base_folder):
         for dir in dirs:
+            # skip camera directories (cam_1, cam_2 etc)
+            if re.search("^cam_[0-9]$", dir):
+                break
             full_dir = f"{root}/{dir}".replace("\\", "/")
             survey_json = f"{full_dir}/survey.json"
             if file_ops.exists(survey_json):
+                survey_image_folders.append(full_dir)
+            elif file_ops.isdir(f"{full_dir}/cam_1"):
                 survey_image_folders.append(full_dir)
             else:
                 photos = glob.iglob(f"{full_dir}/*.jpg")
@@ -101,12 +108,26 @@ def read_survey_data(base_folder,
             survey_file = f'{full_survey_path}/survey.json'
 
             survey = read_survey_file(survey_file, samba)
+            # multi camera system will have folders of the form cam_1, cam_2 for images
+            # old format has photos in the survey folder
+            survey.camera_dirs = {}
+            cam_num =1
+            while True:
+                cam_dir = f"{full_survey_path}/cam_{cam_num}"
+                if file_ops.isdir(cam_dir):
+                    survey.camera_dirs[cam_num] = cam_dir
+                    cam_num+=1
+                else:
+                    break
+
+            if not survey.camera_dirs:
+                survey.camera_dirs[1] = full_survey_path
 
             full_stats = not (samba or slow_network)
             if archive:
                 has_photos = True
             else:
-                has_photos = get_stats_from_photos(file_ops, full_survey_path, survey, full_stats)
+                has_photos = get_stats_from_photos(file_ops, survey.camera_dirs, survey, full_stats)
 
             survey.folder = full_survey_path
             survey.samba = samba
@@ -150,42 +171,51 @@ def read_survey_file(survey_file, samba: bool):
 #     return json_folder + "/" + survey_id
 
 
-def get_stats_from_photos(file_ops, full_path, survey, full):
-    files = file_ops.listjpegsfast(full_path)
-    photos = [name for name in files if name.lower().endswith(".jpg") or name.lower().endswith(".jpeg")]
-    photos.sort()
-    count_photos = len(photos)
-    if not full and count_photos > 1000:
-        survey.photos = ">1000"
-    else:
-        survey.photos = count_photos
+def get_stats_from_photos(file_ops, camera_paths, survey, full):
+    count_photos = 0
+    dir_num = 0
+    counting_finished = False
+    for full_path in camera_paths.values():
+        # count the photos
+        if count_photos is not None:
+            files = file_ops.listjpegsfast(full_path)
+            photos = [name for name in files if name.lower().endswith(".jpg") or name.lower().endswith(".jpeg")]
+            photos.sort()
+            count_photos += len(photos)
+            if not full and counting_finished:
+                survey.photos = ">1000"
+            else:
+                survey.photos = count_photos
+                counting_finished = True
 
-    try:
-        if full and count_photos > 0:
-            last_photo_index = len(photos) - 1
-            photo_index = 0
-            photo_name = "2000"
-            while (survey.start_lat is None or photo_name < "2020") and photo_index < last_photo_index:
-                first_photo = f'{full_path}/{photos[photo_index]}'
-                start_exif = get_exif_data(first_photo, False)
-                survey.start_date = start_exif["date_taken"]
-                survey.start_lat = start_exif["latitude"]
-                survey.start_lon = start_exif["longitude"]
-                survey.start_depth = start_exif["altitude"]
-                photo_name = photos[photo_index]
-                photo_index += 1
+        # get start and end dates, depths and positions only do this for the first camera
+        if dir_num == 0:
+            try:
+                if full and count_photos > 0:
+                    last_photo_index = len(photos) - 1
+                    photo_index = 0
+                    photo_name = "2000"
+                    while (survey.start_lat is None or photo_name < "2020") and photo_index < last_photo_index:
+                        first_photo = f'{full_path}/{photos[photo_index]}'
+                        start_exif = get_exif_data(first_photo, False)
+                        survey.start_date = start_exif["date_taken"]
+                        survey.start_lat = start_exif["latitude"]
+                        survey.start_lon = start_exif["longitude"]
+                        survey.start_depth = start_exif["altitude"]
+                        photo_name = photos[photo_index]
+                        photo_index += 1
 
-            photo_index = last_photo_index
-            while survey.finish_lat is None and photo_index > 0:
-                last_photo = f'{full_path}/{photos[photo_index]}'
-                finish_exif = get_exif_data(last_photo, False)
-                survey.finish_date = finish_exif["date_taken"]
-                survey.finish_lat = finish_exif["latitude"]
-                survey.finish_lon = finish_exif["longitude"]
-                survey.finish_depth = finish_exif["altitude"]
-                photo_index -= 1
+                    photo_index = last_photo_index
+                    while survey.finish_lat is None and photo_index > 0:
+                        last_photo = f'{full_path}/{photos[photo_index]}'
+                        finish_exif = get_exif_data(last_photo, False)
+                        survey.finish_date = finish_exif["date_taken"]
+                        survey.finish_lat = finish_exif["latitude"]
+                        survey.finish_lon = finish_exif["longitude"]
+                        survey.finish_depth = finish_exif["altitude"]
+                        photo_index -= 1
 
-    except Exception as e:
-        logger.warning("Error getting metadata for folder " + full_path, e)
-
+            except Exception as e:
+                logger.warning("Error getting metadata for folder " + full_path, e)
+        dir_num+=1
     return count_photos > 0

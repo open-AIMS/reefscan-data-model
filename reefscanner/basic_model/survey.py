@@ -20,29 +20,37 @@ class Survey(object):
         self.start_depth = None
         self.finish_depth = None
 
-        self.operator: str = survey_json.get("operator")
-        self.observer: str = survey_json.get("observer")
-        self.vessel: str = survey_json.get("operator")
-        self.sea: str = survey_json.get("sea")
+        self.camera_dirs = {}
+
+        self.operator: str = self.none_to_empty_string(survey_json.get("operator"))
+        self.observer: str = self.none_to_empty_string(survey_json.get("observer"))
+        self.vessel: str = self.none_to_empty_string(survey_json.get("operator"))
+        self.sea: str = self.none_to_empty_string(survey_json.get("sea"))
 
         if 'wind_speed' in survey_json:
-            self.wind_speed: str = survey_json.get("wind_speed")
+            self.wind_speed: str = self.none_to_empty_string(survey_json.get("wind_speed"))
         else:
-            self.wind_speed: str = survey_json.get("wind")
+            self.wind_speed: str = self.none_to_empty_string(survey_json.get("wind"))
 
-        self.wind_direction: str = survey_json.get("wind_direction")
+        self.wind_direction: str = self.none_to_empty_string(survey_json.get("wind_direction"))
 
-        self.cloud: str = survey_json.get("cloud")
-        self.visibility: str = survey_json.get("visibility")
-        self.tide: str = survey_json.get("tide")
-        self.comments: str = survey_json.get("comments")
-        self.reefcloud_project: str = survey_json.get("reefcloud_project")
-        self.reefcloud_site: int = survey_json.get("reefcloud_site")
+        self.cloud: str = self.none_to_empty_string(survey_json.get("cloud"))
+        self.visibility: str = self.none_to_empty_string(survey_json.get("visibility"))
+        self.tide: str = self.none_to_empty_string(survey_json.get("tide"))
+        self.comments: str = self.none_to_empty_string(survey_json.get("comments"))
+        self.reefcloud_project: str = self.none_to_empty_string(survey_json.get("reefcloud_project"))
+        self.reefcloud_site: int = self.none_to_empty_string(survey_json.get("reefcloud_site"))
 
         if "reefcloud" in survey_json:
             self.reefcloud = ReefcloudUploadInfo(survey_json["reefcloud"])
         else:
             self.reefcloud = None
+
+    def none_to_empty_string(self, str_in):
+        if str_in is None:
+            return ""
+        else:
+            return str_in
 
     def to_json(self):
         r = {"id": self.id,

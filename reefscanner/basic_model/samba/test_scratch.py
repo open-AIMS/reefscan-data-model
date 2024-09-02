@@ -1,2 +1,4 @@
+import re
+
 a = 24.345
-print (f"{a:03.0f}")
+print (re.search("cam_[0-9]$", "greg/cam_1"))
