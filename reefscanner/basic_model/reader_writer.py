@@ -195,24 +195,30 @@ def get_stats_from_photos(file_ops, camera_paths, survey, full):
                     last_photo_index = len(photos) - 1
                     photo_index = 0
                     photo_name = "2000"
-                    while (survey.start_lat is None or photo_name < "2020") and photo_index < last_photo_index:
-                        first_photo = f'{full_path}/{photos[photo_index]}'
-                        start_exif = get_exif_data(first_photo, False)
-                        survey.start_date = start_exif["date_taken"]
-                        survey.start_lat = start_exif["latitude"]
-                        survey.start_lon = start_exif["longitude"]
-                        survey.start_depth = start_exif["altitude"]
-                        photo_name = photos[photo_index]
+                    while (survey.start_lat is None or abs(survey.start_lat) < 0.01 or photo_name < "2020") and photo_index < last_photo_index:
+                        try:
+                            first_photo = f'{full_path}/{photos[photo_index]}'
+                            start_exif = get_exif_data(first_photo, False)
+                            survey.start_date = start_exif["date_taken"]
+                            survey.start_lat = start_exif["latitude"]
+                            survey.start_lon = start_exif["longitude"]
+                            survey.start_depth = start_exif["altitude"]
+                            photo_name = photos[photo_index]
+                        except:
+                            pass
                         photo_index += 1
 
                     photo_index = last_photo_index
-                    while survey.finish_lat is None and photo_index > 0:
-                        last_photo = f'{full_path}/{photos[photo_index]}'
-                        finish_exif = get_exif_data(last_photo, False)
-                        survey.finish_date = finish_exif["date_taken"]
-                        survey.finish_lat = finish_exif["latitude"]
-                        survey.finish_lon = finish_exif["longitude"]
-                        survey.finish_depth = finish_exif["altitude"]
+                    while (survey.finish_lat is None or abs(survey.finish_lat) < 0.01) and photo_index > 0 :
+                        try:
+                            last_photo = f'{full_path}/{photos[photo_index]}'
+                            finish_exif = get_exif_data(last_photo, False)
+                            survey.finish_date = finish_exif["date_taken"]
+                            survey.finish_lat = finish_exif["latitude"]
+                            survey.finish_lon = finish_exif["longitude"]
+                            survey.finish_depth = finish_exif["altitude"]
+                        except:
+                            pass
                         photo_index -= 1
 
             except Exception as e:
