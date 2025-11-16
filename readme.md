@@ -1,4 +1,4 @@
 pip install -r requirements.txt
-build and deploy local
+delete the build folder
 change the version in setup.py
 setup.bat

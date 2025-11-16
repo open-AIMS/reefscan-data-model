@@ -32,9 +32,9 @@ basic_model = BasicModel()
 progress_queue = ProgressNoQueue()
 # basic_model.set_data_folders("D:/Trip7785_DaviesReef_CoralAUV_ReefScanTesting/ReefScan", "")
 # basic_model.set_data_folders("E:/heron_island_tech_2022", r"\\192.168.3.2\images")
-primary_data_folder = "e:/reefscan"
+primary_data_folder = "d:/reefscan"
 backup_data_folder = ""
-basic_model.set_data_folders(primary_data_folder, backup_data_folder, r"\\192.168.3.2\images")
+basic_model.set_data_folders(primary_data_folder, backup_data_folder, r"\\192.168.3.59\images", "reefscan")
 basic_model.slow_network = False
 basic_model.read_from_files(progress_queue, camera_connected=False)
 

@@ -73,7 +73,8 @@ class ArchiveStats:
                 return
             survey_folder = archive_survey_stats.name
             full_archive_folder = archive_folder + "/" + survey_folder
-            files = fnmatch.filter(samba_file_ops.listdir(full_archive_folder), "*.jpg")
+            files = fnmatch.filter(samba_file_ops.listdir(full_archive_folder), "*.jpg") + \
+                    fnmatch.filter(samba_file_ops.listdir(full_archive_folder), "*.bmp")
             archive_survey_stats.archive_files = len(files)
             saved_survey_folder = model.data_folder + "/" + survey_folder
             try:
@@ -86,6 +87,7 @@ class ArchiveStats:
                 archive_survey_stats.save_files = 0
             else:
                 files = fnmatch.filter(os_file_ops.listdir(saved_survey_folder), "*.jpg")
+                files = files + fnmatch.filter(os_file_ops.listdir(saved_survey_folder), "*.bmp")
                 archive_survey_stats.save_files = len(files)
 
             if abs(archive_survey_stats.save_files - archive_survey_stats.archive_files) < 20:

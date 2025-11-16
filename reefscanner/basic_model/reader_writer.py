@@ -15,18 +15,20 @@ from reefscanner.basic_model.progress_queue import ProgressQueue
 from reefscanner.basic_model.samba.file_ops_factory import get_file_ops
 from reefscanner.basic_model.samba.samba_file_ops import SambaFileOps
 from reefscanner.basic_model.survey import Survey
+import itertools
+
 
 logger = logging.getLogger(__name__)
 
 
-def save_survey(survey: Survey, primary_folder, backup_folder, samba):
+def save_survey(survey: Survey, primary_folder, backup_folder, samba, username):
     survey_to_save = survey.to_json()
     folder = survey_to_save.pop('folder')
     samba = survey_to_save.pop('samba')
     if samba:
         with tempfile.TemporaryDirectory() as temp_folder:
             write_json_file(temp_folder, 'survey.json', survey_to_save)
-            ops = SambaFileOps()
+            ops = SambaFileOps(username)
             ops.copyfile(f"{temp_folder}\\survey.json", f"{folder}\\survey.json")
     else:
         write_json_file(folder, 'survey.json', survey_to_save)
@@ -64,7 +66,10 @@ def find_surveys_local_disk(base_folder, file_ops):
             elif file_ops.isdir(f"{full_dir}/cam_1"):
                 survey_image_folders.append(full_dir)
             else:
-                photos = glob.iglob(f"{full_dir}/*.jpg")
+                photos = itertools.chain(
+                    glob.iglob(f"{full_dir}/*.jpg"),
+                    glob.iglob(f"{full_dir}/*.bmp")
+                )
                 if any(photos):
                     survey_image_folders.append(full_dir)
 
@@ -83,12 +88,12 @@ def find_surveys_camera(base_folder, file_ops):
 
 def read_survey_data(base_folder,
                      backup_folder,
-                     progress_queue: ProgressQueue, samba, slow_network, message, archive=False):
+                     progress_queue: ProgressQueue, samba, slow_network, message, username, archive=False):
 
     progress_queue.set_progress_label("Counting Files")
     logger.info(f"message Counting Files {process_time()}")
 
-    file_ops = get_file_ops(samba)
+    file_ops = get_file_ops(samba, username)
     if base_folder is None:
         return {}
 
@@ -107,7 +112,7 @@ def read_survey_data(base_folder,
         if file_ops.isdir(full_survey_path):
             survey_file = f'{full_survey_path}/survey.json'
 
-            survey = read_survey_file(survey_file, samba)
+            survey = read_survey_file(survey_file, samba, username)
             # multi camera system will have folders of the form cam_1, cam_2 for images
             # old format has photos in the survey folder
             survey.camera_dirs = {}
@@ -135,15 +140,15 @@ def read_survey_data(base_folder,
             if survey.id is None:
                 survey.id = os.path.basename(full_survey_path)
                 if not samba:
-                    save_survey(survey, base_folder, backup_folder, samba)
+                    save_survey(survey, base_folder, backup_folder, samba, username)
             if has_photos:
                 data[survey.id] = survey
             progress_queue.set_progress_value()
     return data
 
 
-def read_survey_file(survey_file, samba: bool):
-    ops = get_file_ops(samba)
+def read_survey_file(survey_file, samba: bool, username):
+    ops = get_file_ops(samba, username)
     if ops.exists(survey_file):
         if samba:
             with tempfile.TemporaryDirectory() as folder:
@@ -179,7 +184,7 @@ def get_stats_from_photos(file_ops, camera_paths, survey, full):
         # count the photos
         if count_photos is not None:
             files = file_ops.listjpegsfast(full_path)
-            photos = [name for name in files if name.lower().endswith(".jpg") or name.lower().endswith(".jpeg")]
+            photos = [name for name in files if name.lower().endswith(".jpg") or name.lower().endswith(".jpeg") or name.lower().endswith(".bmp")]
             photos.sort()
             count_photos += len(photos)
             if not full and counting_finished:

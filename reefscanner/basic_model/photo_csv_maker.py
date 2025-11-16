@@ -13,7 +13,7 @@ def make_photo_csv(folder):
     if not os.path.isdir(folder):
         raise Exception("folder " + folder + " does not exist.")
 
-    photos = [name for name in os.listdir(folder) if name.lower().endswith(".jpg")]
+    photos = [name for name in os.listdir(folder) if name.lower().endswith(".jpg") or name.lower().endswith(".bmp")]
 
     dicts = []
     for photo in photos:

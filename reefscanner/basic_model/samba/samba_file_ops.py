@@ -5,8 +5,8 @@ from reefscanner.basic_model.model_utils import samba_listdir
 
 
 class SambaFileOps:
-    def __init__(self):
-        smbclient.ClientConfig(username='jetson', password='jetson')
+    def __init__(self, username):
+        smbclient.ClientConfig(username=username, password=username)
 
     def file_size_mb(self, file):
         # return smbclient.path.getsize(file)/1000000

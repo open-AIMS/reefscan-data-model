@@ -9,16 +9,16 @@ class Survey(object):
         self.folder: str = survey_json.get("folder")
         self.site: str = survey_json.get("site")
 
-        self.photos = None
-        self.start_date = None
-        self.start_lat = None
-        self.start_lon = None
-        self.finish_date = None
-        self.finish_lat = None
-        self.finish_lon = None
-        self.time_name = None
-        self.start_depth = None
-        self.finish_depth = None
+        self.photos = self.none_to_empty_string(survey_json.get("photos"))
+        self.start_date = self.none_to_empty_string(survey_json.get("start_date"))
+        self.start_lat = self.none_to_empty_string(survey_json.get("start_lat"))
+        self.start_lon = self.none_to_empty_string(survey_json.get("start_lon"))
+        self.finish_date = self.none_to_empty_string(survey_json.get("finish_date"))
+        self.finish_lat = self.none_to_empty_string(survey_json.get("finish_lat"))
+        self.finish_lon = self.none_to_empty_string(survey_json.get("finish_lon"))
+        self.time_name = self.none_to_empty_string(survey_json.get("time_name"))
+        self.start_depth = self.none_to_empty_string(survey_json.get("start_depth"))
+        self.finish_depth = self.none_to_empty_string(survey_json.get("finish_depth"))
 
         self.camera_dirs = {}
 
