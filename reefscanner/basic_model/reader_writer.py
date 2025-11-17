@@ -143,19 +143,23 @@ def read_survey_data(base_folder,
 
 
 def read_survey_file(survey_file, samba: bool):
-    ops = get_file_ops(samba)
-    if ops.exists(survey_file):
-        if samba:
-            with tempfile.TemporaryDirectory() as folder:
-                fname = f"{folder}\\survey.json"
-                ops.copyfile(survey_file, fname)
-                survey_json = read_json_file(fname)
+    try:
+        ops = get_file_ops(samba)
+        if ops.exists(survey_file):
+            if samba:
+                with tempfile.TemporaryDirectory() as folder:
+                    fname = f"{folder}\\survey.json"
+                    ops.copyfile(survey_file, fname)
+                    survey_json = read_json_file(fname)
+            else:
+                survey_json = read_json_file(survey_file)
         else:
-            survey_json = read_json_file(survey_file)
-    else:
-        survey_json = {}
-    survey = Survey(survey_json)
-    return survey
+            survey_json = {}
+        survey = Survey(survey_json)
+        return survey
+    except Exception as e:
+        logger.warning(f"erros reading survey {survey_file}: {e}")
+        return Survey({})
 
 
 # def find_json_folder(survey_id, json_folder):
