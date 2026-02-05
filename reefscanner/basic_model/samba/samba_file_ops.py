@@ -5,8 +5,14 @@ from reefscanner.basic_model.model_utils import samba_listdir
 
 
 class SambaFileOps:
-    def __init__(self):
-        smbclient.ClientConfig(username='jetson', password='jetson')
+    def __init__(self, username):
+        smbclient.ClientConfig(username=username, password=username,
+            connection_options = {
+                "smb_version": "3.1.1",
+                "max_credits": 2048
+            }
+            )
+
 
     def file_size_mb(self, file):
         # return smbclient.path.getsize(file)/1000000
@@ -34,7 +40,9 @@ class SambaFileOps:
         return smbclient.remove(fname)
 
     def copyfile(self, frm, to):
-        return smbclient.shutil.copyfile(frm, to)
+        # create destination folder is it does not exist
+        self.fast_smb_copy(frm, to)
+        return True
 
     def mkdir(self, dir):
         smbclient.mkdir(dir)
@@ -44,3 +52,15 @@ class SambaFileOps:
 
     def move(self, frm, to):
         smbclient.rename(frm, to)
+
+    def fast_smb_copy(self, src_unc, dst_path, buf_size=4 * 1024 * 1024):
+        """
+        High-speed file copy from SMB using large buffered reads.
+        """
+        with smbclient.open_file(src_unc, mode="rb") as fsrc:
+            with open(dst_path, "wb") as fdst:
+                while True:
+                    chunk = fsrc.read(buf_size)
+                    if not chunk:
+                        break
+                    fdst.write(chunk)

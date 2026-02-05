@@ -36,11 +36,12 @@ class BasicModel(object):
         self.camera_data_loaded = False
         self.archived_data_loaded = False
 
-    def set_data_folders(self, data_folder, backup_folder, camera_data_folder):
+    def set_data_folders(self, data_folder, backup_folder, camera_data_folder, username):
         if not os.path.isdir(data_folder):
             os.makedirs(data_folder)
 
         self.data_folder = data_folder
+        self.username = username
         self.camera_data_folder = camera_data_folder
         self.camera_json_folder = data_folder.replace("/reefscan/", "/reefscan_camera_surveys/")
         self.backup_folder = backup_folder
@@ -101,7 +102,7 @@ class BasicModel(object):
         logger.info(f"start read surveys {process_time()}")
 
         surveys_data = read_survey_data(image_folder, backup_folder,
-                                        progress_queue=progress_queue, samba=samba, slow_network=slow_network, message=message, archive=archive)
+                                        progress_queue=progress_queue, samba=samba, slow_network=slow_network, message=message, username= self.username, archive=archive)
         logger.info("finish read surveys")
 
         return surveys_data
