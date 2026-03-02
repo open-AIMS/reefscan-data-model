@@ -223,7 +223,7 @@ def get_stats_from_photos(file_ops, camera_paths, survey, full):
                         photo_index += 1
 
                     photo_index = last_photo_index
-                    while (survey.finish_lat is None or abs(survey.finish_lat) < 0.01) and photo_index > 0 :
+                    while (survey.finish_lat is None or my_abs(survey.finish_lat) < 0.01) and photo_index > 0 :
                         try:
                             last_photo = f'{full_path}/{photos[photo_index]}'
                             finish_exif = get_exif_data(last_photo, False)
