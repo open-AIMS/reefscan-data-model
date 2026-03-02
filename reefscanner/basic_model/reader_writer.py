@@ -179,6 +179,11 @@ def read_survey_file(survey_file, samba: bool, username):
 #
 #     return json_folder + "/" + survey_id
 
+def my_abs(value):
+    try:
+        return abs(value)
+    except:
+        return 0
 
 def get_stats_from_photos(file_ops, camera_paths, survey, full):
     count_photos = 0
@@ -204,7 +209,7 @@ def get_stats_from_photos(file_ops, camera_paths, survey, full):
                     last_photo_index = len(photos) - 1
                     photo_index = 0
                     photo_name = "2000"
-                    while (survey.start_lat is None or abs(survey.start_lat) < 0.01 or photo_name < "2020") and photo_index < last_photo_index:
+                    while (survey.start_lat is None or my_abs(survey.start_lat) < 0.01 or photo_name < "2020") and photo_index < last_photo_index:
                         try:
                             first_photo = f'{full_path}/{photos[photo_index]}'
                             start_exif = get_exif_data(first_photo, False)
